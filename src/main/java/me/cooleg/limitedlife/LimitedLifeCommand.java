@@ -104,6 +104,10 @@ public class LimitedLifeCommand implements Command {
 
     @SubCommand("boogeyman")
     public boolean boogeymanSubcommand(CommandSender sender, String alias, String[] strings) {
+        for (LimitedLifePlayer player : LimitedLifePlayer.getPlayers()) {
+            if (player.isBoogeyman()) {sender.sendMessage(ChatColor.RED + "There is still an active boogeyman!"); return true;}
+        }
+
         if (strings.length < 2) {return true;}
         try {
             int boogeymen = Integer.parseInt(strings[1]);

@@ -9,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class LimitedLifePlayer {
@@ -105,6 +107,8 @@ public class LimitedLifePlayer {
             LimitedLife.getSQL().setTimeLeftNow(player.id, player.seconds);
         }
     }
+
+    public static Collection<LimitedLifePlayer> getPlayers() {return playerMap.values();}
 
     public static LimitedLifePlayer byUUID(UUID id) {
         return playerMap.computeIfAbsent(id, LimitedLifePlayer::new);
