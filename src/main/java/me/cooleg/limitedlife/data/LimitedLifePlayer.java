@@ -57,7 +57,7 @@ public class LimitedLifePlayer {
     }
 
     public static void updateTimes() {
-        for (LimitedLifePlayer player : playerMap.values()) {
+        for (LimitedLifePlayer player : playerMap.values().stream().toList()) {
             if (!player.timeFound) {return;}
             player.seconds--;
             Player p = Bukkit.getPlayer(player.id);
