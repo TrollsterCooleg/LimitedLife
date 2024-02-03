@@ -84,6 +84,32 @@ public class SQLUtils {
         }
     }
 
+    public void addTimeOffline(UUID id, long seconds) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = getConnection();
+            try (PreparedStatement statement = conn.prepareStatement("UPDATE LimitedLife SET SecondsLeft = SecondsLeft + ? WHERE UUID = ?")) {
+                statement.setLong(1, seconds);
+                statement.setString(2, id.toString());
+                statement.executeUpdate();
+            }catch (SQLException ex) {
+                Bukkit.getLogger().severe("FAILED TO ADD TIME FOR UUID " + id.toString());
+            }
+        });
+    }
+
+    public void subtractTimeOffline(UUID id, long seconds) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = getConnection();
+            try (PreparedStatement statement = conn.prepareStatement("UPDATE LimitedLife SET SecondsLeft = SecondsLeft - ? WHERE UUID = ?")) {
+                statement.setLong(1, seconds);
+                statement.setString(2, id.toString());
+                statement.executeUpdate();
+            }catch (SQLException ex) {
+                Bukkit.getLogger().severe("FAILED TO SUBTRACT TIME FOR UUID " + id.toString());
+            }
+        });
+    }
+
     public void getTimeLeft(UUID id, Consumer<Long> callback) {
         CompletableFuture.runAsync(() -> {
             Connection conn = getConnection();

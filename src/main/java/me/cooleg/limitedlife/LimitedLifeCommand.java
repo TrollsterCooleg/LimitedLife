@@ -8,6 +8,7 @@ import me.cooleg.limitedlife.utils.TextFormatting;
 import me.cooleg.limitedlife.utils.TimerRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,13 +35,24 @@ public class LimitedLifeCommand implements Command {
     @SubCommand("addtime")
     public boolean addTimeSubcommand(CommandSender sender, String alias, String[] strings) {
         if (strings.length < 3) {sender.sendMessage(ChatColor.RED + "Incorrect Arguments!"); return true;}
-        Player target = Bukkit.getPlayer(strings[1]);
-        if (target == null) {sender.sendMessage(ChatColor.RED + "Could not find player by the name of " + strings[1] + "."); return true;}
+        OfflinePlayer target = Bukkit.getOfflinePlayer(strings[1]);
+        if (!target.isOnline()) {
+            try {
+                int time = Integer.parseInt(strings[2]);
+                LimitedLife.getSQL().addTimeOffline(target.getUniqueId(), time);
+                sender.sendMessage(ChatColor.GREEN + "Time hopefully added to offline player!");
+            } catch (NumberFormatException ex) {
+                sender.sendMessage(ChatColor.RED + "Invalid argument for seconds!");
+            }
+            return true;
+        }
+
         try {
+            Player online = target.getPlayer();
             int time = Integer.parseInt(strings[2]);
             LimitedLifePlayer player = LimitedLifePlayer.byUUID(target.getUniqueId());
             player.setSeconds(player.getSeconds() + time);
-            target.sendTitle(ChatColor.GREEN + "+" + TextFormatting.secondsToTime(time), null);
+            online.sendTitle(ChatColor.GREEN + "+" + TextFormatting.secondsToTime(time), null);
             sender.sendMessage(ChatColor.GREEN + "Time successfully added to player!");
         } catch (NumberFormatException ex) {
             sender.sendMessage(ChatColor.RED + "Invalid argument for seconds!");
@@ -52,13 +64,24 @@ public class LimitedLifeCommand implements Command {
     @SubCommand("removetime")
     public boolean removeTimeSubcommand(CommandSender sender, String alias, String[] strings) {
         if (strings.length < 3) {sender.sendMessage(ChatColor.RED + "Incorrect Arguments!"); return true;}
-        Player target = Bukkit.getPlayer(strings[1]);
-        if (target == null) {sender.sendMessage(ChatColor.RED + "Could not find player by the name of " + strings[1] + "."); return true;}
+        OfflinePlayer target = Bukkit.getOfflinePlayer(strings[1]);
+        if (!target.isOnline()) {
+            try {
+                int time = Integer.parseInt(strings[2]);
+                LimitedLife.getSQL().subtractTimeOffline(target.getUniqueId(), time);
+                sender.sendMessage(ChatColor.GREEN + "Time hopefully removed from offline player!");
+            } catch (NumberFormatException ex) {
+                sender.sendMessage(ChatColor.RED + "Invalid argument for seconds!");
+            }
+            return true;
+        }
+
         try {
+            Player online = target.getPlayer();
             int time = Integer.parseInt(strings[2]);
             LimitedLifePlayer player = LimitedLifePlayer.byUUID(target.getUniqueId());
             player.setSeconds(player.getSeconds() - time);
-            target.sendTitle(ChatColor.RED + "-" + TextFormatting.secondsToTime(time), null);
+            online.sendTitle(ChatColor.RED + "-" + TextFormatting.secondsToTime(time), null);
             sender.sendMessage(ChatColor.GREEN + "Time successfully removed from player!");
         } catch (NumberFormatException ex) {
             sender.sendMessage(ChatColor.RED + "Invalid argument for seconds!");
