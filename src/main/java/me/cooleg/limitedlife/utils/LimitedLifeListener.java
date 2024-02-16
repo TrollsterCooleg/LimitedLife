@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -47,15 +47,13 @@ public class LimitedLifeListener implements Listener {
     }
 
     @EventHandler
-    public void asyncLogin(AsyncPlayerPreLoginEvent event) {
-        Long time = utils.getTimeLeftNow(event.getUniqueId());
-        if (time == null) {return;}
-        if (time <= 0) {event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "You ran out of time :(");}
+    public void quit(PlayerQuitEvent event) {
+        LimitedLifePlayer.logoff(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
-    public void quit(PlayerQuitEvent event) {
-        LimitedLifePlayer.logoff(event.getPlayer().getUniqueId());
+    public void onChat(AsyncPlayerChatEvent event) {
+        event.setFormat("%s" + ChatColor.RESET + ": %s");
     }
 
 }

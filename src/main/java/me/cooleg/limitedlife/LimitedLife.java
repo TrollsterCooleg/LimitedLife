@@ -29,7 +29,7 @@ public final class LimitedLife extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LimitedLifeListener(sql), this);
         new TimerRunnable().runTaskTimer(this, 20L, 20L);
 
-        new CommandRegistry().registerCommand(new LimitedLifeCommand());
+        new CommandRegistry().registerCommand(new LimitedLifeCommand(this));
         setupTeams();
     }
 
@@ -44,6 +44,9 @@ public final class LimitedLife extends JavaPlugin {
         }
         if (scoreboard.getTeam("GREEN") == null) {
             scoreboard.registerNewTeam("GREEN").setColor(ChatColor.GREEN);
+        }
+        if (scoreboard.getTeam("SPECTATOR") == null) {
+            scoreboard.registerNewTeam("SPECTATOR").setColor(ChatColor.GRAY);
         }
     }
 

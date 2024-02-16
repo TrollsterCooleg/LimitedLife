@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -19,6 +20,11 @@ import java.util.Random;
 public class LimitedLifeCommand implements Command {
 
     private final Random random = new Random();
+    private final LimitedLife limitedLife;
+
+    public LimitedLifeCommand(LimitedLife limitedLife) {
+        this.limitedLife = limitedLife;
+    }
 
     @Override
     public boolean rootCommand(CommandSender commandSender, String alias) {
@@ -134,25 +140,33 @@ public class LimitedLifeCommand implements Command {
         if (strings.length < 2) {return true;}
         try {
             int boogeymen = Integer.parseInt(strings[1]);
-            int size = Bukkit.getOnlinePlayers().size();
             List<? extends Player> players = Bukkit.getOnlinePlayers().stream().toList();
+            players = players.stream().filter((player) -> LimitedLifePlayer.byUUID(player.getUniqueId()).getSeconds() > 28800).toList();
 
-            if (boogeymen > size) {sender.sendMessage(ChatColor.RED + "More boogeymen than players online!"); return true;}
-
-            int done = 0;
+            if (boogeymen > players.size()) {sender.sendMessage(ChatColor.RED + "More boogeymen than non-red players online!"); return true;}
 
             for (int i = 0; i < boogeymen; i++) {
-                int rand = random.nextInt(size);
+                int rand = random.nextInt(players.size());
                 LimitedLifePlayer player = LimitedLifePlayer.byUUID(players.get(rand).getUniqueId());
                 if (player.isBoogeyman()) {i--; continue;}
                 player.setBoogeyman(true);
             }
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                LimitedLifePlayer limitedLifePlayer = LimitedLifePlayer.byUUID(player.getUniqueId());
-                String title = limitedLifePlayer.isBoogeyman() ? ChatColor.RED + "You ARE the boogeyman!" : ChatColor.GREEN + "You are NOT the boogeyman!";
-                player.sendTitle(title, null);
+                player.sendTitle(ChatColor.RED + "You are...", null);
             }
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        LimitedLifePlayer limitedLifePlayer = LimitedLifePlayer.byUUID(player.getUniqueId());
+                        String title = limitedLifePlayer.isBoogeyman() ? ChatColor.RED + "The boogeyman!" : ChatColor.GREEN + "NOT the boogeyman!";
+                        player.sendTitle(title, null);
+                    }
+                }
+            }.runTaskLater(limitedLife,60);
+
 
             sender.sendMessage(ChatColor.GREEN + "Chose boogeymen!");
         } catch (NumberFormatException ex) {

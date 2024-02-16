@@ -6,12 +6,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class LimitedLifePlayer {
@@ -58,14 +59,27 @@ public class LimitedLifePlayer {
 
     public static void updateTimes() {
         for (LimitedLifePlayer player : playerMap.values().stream().toList()) {
-            if (!player.timeFound) {return;}
-            player.seconds--;
+            if (!player.timeFound) {continue;}
             Player p = Bukkit.getPlayer(player.id);
             if (p == null) {continue;}
 
             if (player.seconds <= 0) {
-                p.kickPlayer("You've ran out of time.");
+                if (p.getGameMode() != GameMode.SPECTATOR) {
+                    p.setGameMode(GameMode.SPECTATOR);
+                    for (Player players : Bukkit.getOnlinePlayers()) {
+                        players.sendTitle(ChatColor.RED + p.getName(), "ran out of time!");
+                        players.playSound(players.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
+                    }
+                }
+
+                scoreboard.getTeam("SPECTATOR").addPlayer(p);
+                p.setDisplayName(ChatColor.GRAY + p.getName());
+                player.seconds = 0;
+                continue;
             }
+
+            player.seconds--;
+
 
             String string = TextFormatting.secondsToTime(player.seconds);
             string = TextFormatting.replaceWithUnicode(string);
