@@ -211,6 +211,30 @@ public class LimitedLifeCommand implements Command {
         return true;
     }
 
+    @SubCommand("checktime")
+    public boolean checkTimeCommand(CommandSender sender, String alias, String[] strings) {
+        if (strings.length < 2) {return true;}
+        String name = strings[1];
+        Player player = Bukkit.getPlayer(name);
+        if (player == null) {sender.sendMessage(ChatColor.RED + "Player does not exist!");}
+        LimitedLifePlayer limitedLifePlayer = LimitedLifePlayer.byUUID(player.getUniqueId());
+
+        long seconds = limitedLifePlayer.getSeconds();
+        if (seconds > 86400) {
+            sender.sendMessage(ChatColor.DARK_GREEN + TextFormatting.secondsToTime(seconds));
+        } else if (seconds > 57600) {
+            sender.sendMessage(ChatColor.GREEN + TextFormatting.secondsToTime(seconds));
+        } else if (seconds > 28800) {
+            sender.sendMessage(ChatColor.YELLOW + TextFormatting.secondsToTime(seconds));
+        } else if (seconds > 0) {
+            sender.sendMessage(ChatColor.RED + TextFormatting.secondsToTime(seconds));
+        } else {
+            sender.sendMessage(ChatColor.GRAY + "This player is dead :(");
+        }
+
+        return true;
+    }
+
     @Nonnull
     @Override
     public String name() {
