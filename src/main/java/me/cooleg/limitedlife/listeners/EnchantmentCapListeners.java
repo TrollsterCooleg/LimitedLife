@@ -70,6 +70,13 @@ public class EnchantmentCapListeners implements Listener {
 
     @EventHandler
     public void inventoryOpen(InventoryOpenEvent event) {
+        for (ItemStack itemStack : event.getPlayer().getInventory()) {
+            if (itemStack == null) {continue;}
+            if (itemStack.getType() == Material.AIR) {continue;}
+
+            restrictItemEnchant(itemStack);
+        }
+
         for (ItemStack itemStack : event.getInventory()) {
             if (itemStack == null) {continue;}
             if (itemStack.getType() == Material.AIR) {continue;}
@@ -81,6 +88,13 @@ public class EnchantmentCapListeners implements Listener {
     @EventHandler
     public void inventoryClick(InventoryClickEvent event) {
         for (ItemStack itemStack : event.getWhoClicked().getInventory()) {
+            if (itemStack == null) {continue;}
+            if (itemStack.getType() == Material.AIR) {continue;}
+
+            restrictItemEnchant(itemStack);
+        }
+
+        for (ItemStack itemStack : event.getInventory()) {
             if (itemStack == null) {continue;}
             if (itemStack.getType() == Material.AIR) {continue;}
 
