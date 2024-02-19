@@ -11,3 +11,5 @@ maxenchantlevel: 2
 netheritedisabled: true
 
 potionsdisabled: true
+
+helmetsdisabled: true

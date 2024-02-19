@@ -3,7 +3,9 @@ package me.cooleg.limitedlife;
 import me.cooleg.easycommands.CommandRegistry;
 import me.cooleg.limitedlife.data.ConfigWrapper;
 import me.cooleg.limitedlife.data.LimitedLifePlayer;
-import me.cooleg.limitedlife.utils.LimitedLifeListener;
+import me.cooleg.limitedlife.listeners.EnchantmentCapListeners;
+import me.cooleg.limitedlife.listeners.HelmetListeners;
+import me.cooleg.limitedlife.listeners.LimitedLifeListener;
 import me.cooleg.limitedlife.utils.OfflinePenaltyHandling;
 import me.cooleg.limitedlife.utils.SQLUtils;
 import me.cooleg.limitedlife.utils.TimerRunnable;
@@ -30,7 +32,9 @@ public final class LimitedLife extends JavaPlugin {
 
         penalty = new OfflinePenaltyHandling(this, sql);
 
-        Bukkit.getPluginManager().registerEvents(new LimitedLifeListener(sql, penalty), this);
+        Bukkit.getPluginManager().registerEvents(new LimitedLifeListener(penalty), this);
+        Bukkit.getPluginManager().registerEvents(new EnchantmentCapListeners(), this);
+        Bukkit.getPluginManager().registerEvents(new HelmetListeners(), this);
         new TimerRunnable(penalty).runTaskTimer(this, 20L, 20L);
 
         new CommandRegistry().registerCommand(new LimitedLifeCommand(this, penalty));

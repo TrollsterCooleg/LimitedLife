@@ -33,7 +33,7 @@ public class LimitedLifeCommand implements Command {
     @Override
     public boolean rootCommand(CommandSender commandSender, String alias) {
         commandSender.sendMessage(ChatColor.YELLOW + "Plugin coded by @cooleg on discord!");
-        commandSender.sendMessage(ChatColor.AQUA + "Subcommands: addtime <player> <seconds>, removetime <player> <seconds>, addkill <player>, adddeath <player>, pausetime, boogeyman <count>, cure <player>, punish");
+        commandSender.sendMessage(ChatColor.AQUA + "Subcommands: addtime <player> <seconds>, removetime <player> <seconds>, addkill <player>, adddeath <player>, pausetime, boogeyman <count>, cure <player>, punish, checktime <player>, setdeduction <number>, offlinepenalty <true/false>");
         return true;
     }
 
@@ -202,12 +202,12 @@ public class LimitedLifeCommand implements Command {
             limitedLifePlayer.setBoogeyman(false);
             remaining += player.getName() + ",";
 
-            if (limitedLifePlayer.getSeconds() > 57600) {
-                limitedLifePlayer.setSeconds(57600);
-            } else if (limitedLifePlayer.getSeconds() > 28800) {
-                limitedLifePlayer.setSeconds(28800);
-            } else {
-                limitedLifePlayer.setSeconds(0);
+            if (limitedLifePlayer.getSeconds() > ConfigWrapper.initialTime) {
+                limitedLifePlayer.setSeconds(ConfigWrapper.initialTime);
+            } else if (limitedLifePlayer.getSeconds() > ConfigWrapper.yellowTime) {
+                limitedLifePlayer.setSeconds(ConfigWrapper.yellowTime);
+            } else if (limitedLifePlayer.getSeconds() > ConfigWrapper.redTime) {
+                limitedLifePlayer.setSeconds(ConfigWrapper.redTime);
             }
         }
 
@@ -224,11 +224,11 @@ public class LimitedLifeCommand implements Command {
         LimitedLifePlayer limitedLifePlayer = LimitedLifePlayer.byUUID(player.getUniqueId());
 
         long seconds = limitedLifePlayer.getSeconds();
-        if (seconds > 86400) {
+        if (seconds > ConfigWrapper.initialTime) {
             sender.sendMessage(ChatColor.DARK_GREEN + TextFormatting.secondsToTime(seconds));
-        } else if (seconds > 57600) {
+        } else if (seconds > ConfigWrapper.yellowTime) {
             sender.sendMessage(ChatColor.GREEN + TextFormatting.secondsToTime(seconds));
-        } else if (seconds > 28800) {
+        } else if (seconds > ConfigWrapper.redTime) {
             sender.sendMessage(ChatColor.YELLOW + TextFormatting.secondsToTime(seconds));
         } else if (seconds > 0) {
             sender.sendMessage(ChatColor.RED + TextFormatting.secondsToTime(seconds));

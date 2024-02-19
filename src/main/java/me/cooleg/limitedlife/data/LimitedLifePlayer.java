@@ -86,15 +86,15 @@ public class LimitedLifePlayer {
             string = TextFormatting.replaceWithUnicode(string);
 
             ComponentBuilder builder = new ComponentBuilder("\uDB00\uDE00" + string);
-            if (player.seconds > 86400) {
+            if (player.seconds > ConfigWrapper.initialTime) {
                 builder.color(ChatColor.DARK_GREEN);
                 p.setDisplayName(ChatColor.DARK_GREEN + p.getName());
                 scoreboard.getTeam("DARKGREEN").addPlayer(p);
-            } else if (player.seconds > 57600) {
+            } else if (player.seconds > ConfigWrapper.yellowTime) {
                 builder.color(ChatColor.GREEN);
                 p.setDisplayName(ChatColor.GREEN + p.getName());
                 scoreboard.getTeam("GREEN").addPlayer(p);
-            } else if (player.seconds > 28800) {
+            } else if (player.seconds > ConfigWrapper.redTime) {
                 builder.color(ChatColor.YELLOW);
                 p.setDisplayName(ChatColor.YELLOW + p.getName());
                 scoreboard.getTeam("YELLOW").addPlayer(p);
