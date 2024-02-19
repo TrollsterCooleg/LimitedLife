@@ -3,3 +3,11 @@ initialtime: 86400
 timegainedforkill: 1800
 
 timelostondeath: 3600
+
+offlinepenalty: 1.25
+
+maxenchantlevel: 2
+
+netheritedisabled: true
+
+potionsdisabled: true

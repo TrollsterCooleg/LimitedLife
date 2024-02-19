@@ -2,8 +2,10 @@ package me.cooleg.limitedlife;
 
 import me.cooleg.easycommands.Command;
 import me.cooleg.easycommands.commandmeta.SubCommand;
+import me.cooleg.easycommands.commandmeta.TabCompleter;
 import me.cooleg.limitedlife.data.ConfigWrapper;
 import me.cooleg.limitedlife.data.LimitedLifePlayer;
+import me.cooleg.limitedlife.utils.OfflinePenaltyHandling;
 import me.cooleg.limitedlife.utils.TextFormatting;
 import me.cooleg.limitedlife.utils.TimerRunnable;
 import org.bukkit.Bukkit;
@@ -21,8 +23,10 @@ public class LimitedLifeCommand implements Command {
 
     private final Random random = new Random();
     private final LimitedLife limitedLife;
+    private final OfflinePenaltyHandling penalty;
 
-    public LimitedLifeCommand(LimitedLife limitedLife) {
+    public LimitedLifeCommand(LimitedLife limitedLife, OfflinePenaltyHandling handling) {
+        this.penalty = handling;
         this.limitedLife = limitedLife;
     }
 
@@ -233,6 +237,47 @@ public class LimitedLifeCommand implements Command {
         }
 
         return true;
+    }
+
+    @SubCommand("setdeduction")
+    public boolean setDeductionCommand(CommandSender sender, String alias, String[] strings) {
+        if (strings.length < 2) {return true;}
+        String deductionString = strings[1];
+
+        try {
+            int deduction = Integer.parseInt(deductionString);
+            LimitedLifePlayer.setSecondDeduction(deduction);
+            sender.sendMessage(ChatColor.GREEN + "Set time deduction multiplier to " + deduction + "!");
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(ChatColor.RED + "Invalid argument for deduction!");
+        }
+
+        return true;
+    }
+
+    @SubCommand("offlinepenalty")
+    public boolean togglePenaltyCommand(CommandSender sender, String alias, String[] strings) {
+        if (strings.length < 2) {
+            sender.sendMessage(ChatColor.AQUA + "Offline penalty is currently: " + penalty.isEnabled());
+            return true;
+        }
+
+        String penaltyString = strings[1];
+
+        try {
+            boolean doPenalty = Boolean.parseBoolean(penaltyString);
+            penalty.setEnabled(doPenalty);
+            sender.sendMessage(ChatColor.GREEN + "Set offline penalty timer to " + doPenalty + "!");
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(ChatColor.RED + "Invalid argument for on/off!");
+        }
+
+        return true;
+    }
+
+    @TabCompleter("offlinepenalty")
+    public List<String> togglePenaltyTabComplete(CommandSender sender, String alias, String[] strings) {
+        return List.of("true", "false");
     }
 
     @Nonnull

@@ -5,8 +5,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimerRunnable extends BukkitRunnable {
 
+    private final OfflinePenaltyHandling penalty;
     private int time = 0;
     public static boolean enabled = true;
+
+    public TimerRunnable(OfflinePenaltyHandling penalty) {
+        this.penalty = penalty;
+    }
 
     @Override
     public void run() {
@@ -15,8 +20,10 @@ public class TimerRunnable extends BukkitRunnable {
         time++;
 
         LimitedLifePlayer.updateTimes();
+        penalty.addRecordedTime();
         if (time >= 300) {
             LimitedLifePlayer.saveAll();
+            penalty.save();
             time = 0;
         }
     }

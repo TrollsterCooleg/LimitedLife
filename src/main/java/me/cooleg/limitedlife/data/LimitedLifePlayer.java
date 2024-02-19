@@ -19,6 +19,7 @@ public class LimitedLifePlayer {
 
     private static final HashMap<UUID, LimitedLifePlayer> playerMap = new HashMap<>();
     private static final Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+    private static int secondDeduction = 1;
     private final UUID id;
     private long seconds;
     private boolean timeFound;
@@ -78,7 +79,7 @@ public class LimitedLifePlayer {
                 continue;
             }
 
-            player.seconds--;
+            player.seconds -= secondDeduction;
 
 
             String string = TextFormatting.secondsToTime(player.seconds);
@@ -124,6 +125,10 @@ public class LimitedLifePlayer {
         for (LimitedLifePlayer player : playerMap.values()) {
             LimitedLife.getSQL().setTimeLeftNow(player.id, player.seconds);
         }
+    }
+
+    public static void setSecondDeduction(int deduction) {
+        secondDeduction = deduction;
     }
 
     public static Collection<LimitedLifePlayer> getPlayers() {return playerMap.values();}

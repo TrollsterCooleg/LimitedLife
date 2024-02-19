@@ -4,6 +4,7 @@ import me.cooleg.easycommands.CommandRegistry;
 import me.cooleg.limitedlife.data.ConfigWrapper;
 import me.cooleg.limitedlife.data.LimitedLifePlayer;
 import me.cooleg.limitedlife.utils.LimitedLifeListener;
+import me.cooleg.limitedlife.utils.OfflinePenaltyHandling;
 import me.cooleg.limitedlife.utils.SQLUtils;
 import me.cooleg.limitedlife.utils.TimerRunnable;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import java.io.File;
 public final class LimitedLife extends JavaPlugin {
 
     private static SQLUtils sql;
+    private OfflinePenaltyHandling penalty;
 
     @Override
     public void onEnable() {
@@ -26,10 +28,12 @@ public final class LimitedLife extends JavaPlugin {
         sql = new SQLUtils(file, this);
         sql.createTable();
 
-        Bukkit.getPluginManager().registerEvents(new LimitedLifeListener(sql), this);
-        new TimerRunnable().runTaskTimer(this, 20L, 20L);
+        penalty = new OfflinePenaltyHandling(this, sql);
 
-        new CommandRegistry().registerCommand(new LimitedLifeCommand(this));
+        Bukkit.getPluginManager().registerEvents(new LimitedLifeListener(sql, penalty), this);
+        new TimerRunnable(penalty).runTaskTimer(this, 20L, 20L);
+
+        new CommandRegistry().registerCommand(new LimitedLifeCommand(this, penalty));
         setupTeams();
     }
 
@@ -56,6 +60,7 @@ public final class LimitedLife extends JavaPlugin {
     @Override
     public void onDisable() {
         LimitedLifePlayer.shutdown();
+        penalty.saveNow();
     }
 
     public static SQLUtils getSQL() {
